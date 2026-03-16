@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>GraamScore — Rural Credit Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --green: #00c853;
+    --green-light: #69f0ae;
+    --green-dark: #007a33;
+    --earth: #c8a96e;
+    --earth-light: #f5e6c8;
+    --dark: #0a1a0f;
+    --dark2: #112218;
+    --dark3: #1a3325;
+    --mid: #2d5a3d;
+    --text: #e8f5e9;
+    --text-muted: #81c784;
+    --red: #ff5252;
+    --yellow: #ffd740;
+    --card: rgba(26, 51, 37, 0.85);
+    --border: rgba(0, 200, 83, 0.15);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--dark);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 10%, rgba(0,200,83,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(200,169,110,0.06) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2.5rem;
+    background: rgba(10,26,15,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem; font-weight: 800;
+    color: var(--green);
+    letter-spacing: -0.5px;
+  }
+  .logo span { color: var(--earth); }
+  .nav-badge {
+    font-size: 0.7rem; font-weight: 500;
+    background: rgba(0,200,83,0.1);
+    border: 1px solid rgba(0,200,83,0.3);
+    color: var(--green-light);
+    padding: 0.25rem 0.75rem;
+    border-radius: 100px;
+    letter-spacing: 0.5px;
+  }
+
+  /* HERO */
+  .hero {
+    position: relative; z-index: 1;
+    text-align: center;
+    padding: 5rem 2rem 3rem;
+  }
+  .hero-tag {
+    display: inline-block;
+    font-size: 0.72rem; font-weight: 500; letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--earth);
+    border: 1px solid rgba(200,169,110,0.3);
+    padding: 0.4rem 1rem;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 1.2rem;
+  }
+  .hero h1 .accent { color: var(--green); }
+  .hero h1 .accent2 { color: var(--earth); }
+  .hero p {
+    font-size: 1.1rem; font-weight: 300;
+    color: var(--text-muted);
+    max-width: 540px; margin: 0 auto 2.5rem;
+    line-height: 1.7;
+  }
+  .hero-stats {
+    display: flex; justify-content: center; gap: 3rem;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+  }
+  .stat { text-align: center; }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem; font-weight: 800;
+    color: var(--green);
+  }
+  .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem; letter-spacing: 0.5px; }
+
+  /* MAIN CONTAINER */
+  .container {
+    position: relative; z-index: 1;
+    max-width: 900px; margin: 0 auto;
+    padding: 0 1.5rem 5rem;
+  }
+
+  /* STEPS */
+  .steps {
+    display: flex; justify-content: center; gap: 0;
+    margin-bottom: 3rem;
+    background: var(--dark2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .step {
+    flex: 1; text-align: center;
+    padding: 1rem;
+    font-size: 0.8rem; font-weight: 500;
+    color: var(--text-muted);
+    border-right: 1px solid var(--border);
+    transition: all 0.3s;
+    cursor: default;
+  }
+  .step:last-child { border-right: none; }
+  .step.active { background: rgba(0,200,83,0.08); color: var(--green); }
+  .step.done { background: rgba(0,200,83,0.05); color: var(--green-dark); }
+  .step-num {
+    display: block;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem; font-weight: 800;
+    margin-bottom: 0.2rem;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(8px);
+  }
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem; font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.4rem;
+    display: flex; align-items: center; gap: 0.6rem;
+  }
+  .card-title .icon { font-size: 1.2rem; }
+  .card-subtitle { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 2rem; }
+
+  /* FORM */
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+  }
+  .form-grid.full { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+  .form-group.span2 { grid-column: span 2; }
+  label {
+    font-size: 0.78rem; font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+  }
+  input, select {
+    background: rgba(10,26,15,0.8);
+    border: 1px solid rgba(0,200,83,0.2);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus {
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(0,200,83,0.1);
+  }
+  select option { background: var(--dark2); }
+
+  /* RADIO GROUP */
+  .radio-group {
+    display: flex; gap: 0.6rem; flex-wrap: wrap;
+  }
+  .radio-btn {
+    display: flex; align-items: center; gap: 0.4rem;
+    background: rgba(10,26,15,0.8);
+    border: 1px solid rgba(0,200,83,0.2);
+    border-radius: 8px;
+    padding: 0.5rem 0.9rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .radio-btn input { display: none; }
+  .radio-btn:has(input:checked),
+  .radio-btn.selected {
+    border-color: var(--green);
+    background: rgba(0,200,83,0.1);
+    color: var(--green-light);
+  }
+
+  /* DIVIDER */
+  .section-divider {
+    display: flex; align-items: center; gap: 1rem;
+    margin: 2rem 0 1.5rem;
+  }
+  .section-divider span {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.8rem; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--earth);
+    white-space: nowrap;
+  }
+  .section-divider::before, .section-divider::after {
+    content: ''; flex: 1;
+    height: 1px; background: var(--border);
+  }
+
+  /* BTN */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 0.5rem;
+    background: var(--green);
+    color: var(--dark);
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    border: none; border-radius: 12px;
+    padding: 0.9rem 2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: 1.5rem;
+    letter-spacing: 0.3px;
+  }
+  .btn:hover { background: var(--green-light); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(0,200,83,0.25); }
+  .btn:active { transform: translateY(0); }
+  .btn.secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    margin-top: 0.8rem;
+  }
+  .btn.secondary:hover { border-color: var(--green); color: var(--green); background: rgba(0,200,83,0.05); }
+  .btn.earth-btn {
+    background: var(--earth);
+    color: var(--dark);
+  }
+  .btn.earth-btn:hover { background: #e0c080; }
+
+  /* SCORE DISPLAY */
+  .score-hero {
+    text-align: center;
+    padding: 2rem 0 1rem;
+  }
+  .score-ring-wrap {
+    position: relative;
+    width: 200px; height: 200px;
+    margin: 0 auto 1.5rem;
+  }
+  .score-ring-wrap svg {
+    transform: rotate(-90deg);
+    width: 200px; height: 200px;
+  }
+  .score-ring-bg { fill: none; stroke: rgba(0,200,83,0.1); stroke-width: 12; }
+  .score-ring-fill {
+    fill: none;
+    stroke-width: 12;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1);
+  }
+  .score-center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  .score-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 3rem; font-weight: 800;
+    line-height: 1;
+  }
+  .score-label { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; margin-top: 0.2rem; }
+
+  .tier-badge {
+    display: inline-block;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem; font-weight: 700;
+    padding: 0.5rem 1.5rem;
+    border-radius: 100px;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.5px;
+  }
+
+  /* BREAKDOWN */
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  .breakdown-item {
+    background: rgba(10,26,15,0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.2rem;
+  }
+  .breakdown-label { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+  .breakdown-bar-wrap { background: rgba(0,200,83,0.08); border-radius: 100px; height: 6px; margin-bottom: 0.4rem; }
+  .breakdown-bar { height: 6px; border-radius: 100px; transition: width 1s ease; }
+  .breakdown-val {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem; font-weight: 700;
+    color: var(--green);
+  }
+
+  /* LOAN CARDS */
+  .loan-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .loan-card {
+    background: rgba(10,26,15,0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    transition: border-color 0.2s;
+  }
+  .loan-card:hover { border-color: rgba(0,200,83,0.4); }
+  .loan-name { font-family: 'Syne', sans-serif; font-size: 0.9rem; font-weight: 700; color: var(--green-light); margin-bottom: 0.3rem; }
+  .loan-amount { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+  .loan-rate { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
+  .loan-eligible {
+    display: inline-block;
+    font-size: 0.65rem; font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .eligible { background: rgba(0,200,83,0.15); color: var(--green); }
+  .not-eligible { background: rgba(255,82,82,0.1); color: var(--red); }
+
+  /* ROADMAP */
+  .roadmap { margin-top: 1rem; }
+  .roadmap-item {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 1rem;
+    background: rgba(10,26,15,0.6);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 0.8rem;
+  }
+  .roadmap-icon {
+    width: 36px; height: 36px;
+    background: rgba(0,200,83,0.1);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .roadmap-text { flex: 1; }
+  .roadmap-title { font-size: 0.9rem; font-weight: 500; color: var(--text); margin-bottom: 0.2rem; }
+  .roadmap-gain { font-size: 0.8rem; color: var(--green); font-weight: 600; }
+
+  /* HIDDEN */
+  .hidden { display: none !important; }
+
+  /* FARMER PROFILE */
+  .profile-header {
+    display: flex; align-items: center; gap: 1.2rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .profile-avatar {
+    width: 56px; height: 56px;
+    background: rgba(0,200,83,0.1);
+    border: 2px solid rgba(0,200,83,0.3);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+  }
+  .profile-name { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; }
+  .profile-loc { font-size: 0.82rem; color: var(--text-muted); margin-top: 0.2rem; }
+
+  /* SAMPLE PROFILES */
+  .sample-profiles {
+    display: flex; gap: 0.8rem; flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+  }
+  .sample-btn {
+    background: rgba(10,26,15,0.8);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    cursor: pointer;
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .sample-btn:hover { border-color: var(--earth); color: var(--earth); }
+
+  /* ANIMATE */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-up { animation: fadeUp 0.5s ease forwards; }
+
+  @keyframes countUp {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .form-group.span2 { grid-column: span 1; }
+    .breakdown-grid { grid-template-columns: 1fr; }
+    .loan-grid { grid-template-columns: 1fr; }
+    nav { padding: 1rem 1.2rem; }
+    .card { padding: 1.5rem; }
+    .hero h1 { letter-spacing: -1px; }
+    .hero-stats { gap: 1.5rem; }
+    .steps { display: none; }
+  }
+
+  /* RBI BADGE */
+  .rbi-strip {
+    display: flex; align-items: center; gap: 0.6rem;
+    background: rgba(200,169,110,0.07);
+    border: 1px solid rgba(200,169,110,0.2);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.8rem;
+    color: var(--earth);
+  }
+  .rbi-strip strong { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Graam<span>Score</span></div>
+  <div class="nav-badge">RBI AA Framework Aligned</div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-tag">🌾 Rural Credit Intelligence Platform</div>
+  <h1>Credit Scores for<br/><span class="accent">Invisible</span> <span class="accent2">India</span></h1>
+  <p>190 million Indians have no CIBIL score — not because they're irresponsible, but because banks don't look at the right data. We fix that.</p>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">190M+</div>
+      <div class="stat-label">Credit Invisible Indians</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">₹20L Cr</div>
+      <div class="stat-label">Unmet Rural Credit Gap</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">48%</div>
+      <div class="stat-label">Moneylender Interest Rate</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="container">
+
+  <!-- STEPS -->
+  <div class="steps" id="stepsBar">
+    <div class="step active" id="step1tab"><span class="step-num">01</span>Profile</div>
+    <div class="step" id="step2tab"><span class="step-num">02</span>Financial</div>
+    <div class="step" id="step3tab"><span class="step-num">03</span>Assets</div>
+    <div class="step" id="step4tab"><span class="step-num">04</span>Score</div>
+  </div>
+
+  <!-- STEP 1: PERSONAL -->
+  <div id="step1" class="fade-up">
+    <div class="rbi-strip">
+      🏛️ <strong>RBI Account Aggregator Framework:</strong> All data is consent-based. We use alternative signals banks ignore — UPI, bills, SHG records — to build your credit identity.
+    </div>
+
+    <div class="card">
+      <div class="card-title"><span class="icon">👤</span> Personal Details</div>
+      <div class="card-subtitle">Basic information about the applicant</div>
+
+      <div style="margin-bottom:1rem;">
+        <div style="font-size:0.78rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.3px;margin-bottom:0.6rem;">Quick Fill — Try a Sample Profile</div>
+        <div class="sample-profiles">
+          <button class="sample-btn" onclick="fillSample('ramesh')">🧑‍🌾 Ramesh (Farmer)</button>
+          <button class="sample-btn" onclick="fillSample('priya')">👩 Priya (Vendor)</button>
+          <button class="sample-btn" onclick="fillSample('arjun')">👨 Arjun (Artisan)</button>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input id="name" type="text" placeholder="e.g. Ramesh Kumar"/>
+        </div>
+        <div class="form-group">
+          <label>Age</label>
+          <input id="age" type="number" placeholder="e.g. 38" min="18" max="70"/>
+        </div>
+        <div class="form-group">
+          <label>Village / Town</label>
+          <input id="village" type="text" placeholder="e.g. Kurud"/>
+        </div>
+        <div class="form-group">
+          <label>District & State</label>
+          <input id="location" type="text" placeholder="e.g. Dhamtari, Chhattisgarh"/>
+        </div>
+        <div class="form-group span2">
+          <label>Primary Occupation</label>
+          <div class="radio-group" id="occupationGroup">
+            <label class="radio-btn"><input type="radio" name="occupation" value="farmer"/> 🌾 Farmer</label>
+            <label class="radio-btn"><input type="radio" name="occupation" value="vendor"/> 🛒 Street Vendor</label>
+            <label class="radio-btn"><input type="radio" name="occupation" value="artisan"/> 🪡 Artisan</label>
+            <label class="radio-btn"><input type="radio" name="occupation" value="daily_wage"/> 🔨 Daily Wage</label>
+            <label class="radio-btn"><input type="radio" name="occupation" value="small_shop"/> 🏪 Small Shop</label>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Monthly Income (₹)</label>
+          <input id="income" type="number" placeholder="e.g. 18000" min="0"/>
+        </div>
+        <div class="form-group">
+          <label>Loan Amount Needed (₹)</label>
+          <input id="loanNeed" type="number" placeholder="e.g. 50000" min="0"/>
+        </div>
+      </div>
+      <button class="btn" onclick="goStep(2)">Continue to Financial Data →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: FINANCIAL -->
+  <div id="step2" class="hidden fade-up">
+    <div class="card">
+      <div class="card-title"><span class="icon">📱</span> UPI & Payment Behaviour</div>
+      <div class="card-subtitle">Alternative financial data — the data banks ignore</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Monthly UPI Transactions (count)</label>
+          <select id="upiTxn">
+            <option value="">Select range</option>
+            <option value="3">50+ transactions/month</option>
+            <option value="2">20–50 transactions/month</option>
+            <option value="1">Under 20/month</option>
+            <option value="0">No UPI account</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Average Monthly UPI Inflow (₹)</label>
+          <select id="upiInflow">
+            <option value="">Select range</option>
+            <option value="3">Above ₹20,000</option>
+            <option value="2">₹8,000 – ₹20,000</option>
+            <option value="1">₹2,000 – ₹8,000</option>
+            <option value="0">Below ₹2,000</option>
+          </select>
+        </div>
+
+        <div class="section-divider span2"><span>Bill Payment History</span></div>
+
+        <div class="form-group">
+          <label>Electricity / Water Bills Paid On Time (last 12 months)</label>
+          <select id="bills">
+            <option value="">Select</option>
+            <option value="3">10–12 months on time</option>
+            <option value="2">7–9 months on time</option>
+            <option value="1">4–6 months on time</option>
+            <option value="0">Less than 4 months</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Mobile Recharge Frequency</label>
+          <select id="recharge">
+            <option value="">Select</option>
+            <option value="2">Weekly or prepaid auto-renew</option>
+            <option value="1">Monthly</option>
+            <option value="0">Irregular</option>
+          </select>
+        </div>
+
+        <div class="section-divider span2"><span>SHG & Community Finance</span></div>
+
+        <div class="form-group">
+          <label>Self Help Group (SHG) Membership</label>
+          <select id="shg">
+            <option value="">Select</option>
+            <option value="3">Active member, perfect repayment</option>
+            <option value="2">Active member, minor delays</option>
+            <option value="1">Former member</option>
+            <option value="0">Not a member</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Informal Loans — Repayment Record</label>
+          <select id="informal">
+            <option value="">Select</option>
+            <option value="3">Always repaid on time</option>
+            <option value="2">Occasional delays</option>
+            <option value="1">Frequent delays</option>
+            <option value="0">Defaults / never repaid</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" onclick="goStep(3)">Continue to Asset Profile →</button>
+      <button class="btn secondary" onclick="goStep(1)">← Back</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: ASSETS & GOV -->
+  <div id="step3" class="hidden fade-up">
+    <div class="card">
+      <div class="card-title"><span class="icon">🏡</span> Asset Profile</div>
+      <div class="card-subtitle">Physical assets and government scheme participation</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Land Ownership</label>
+          <select id="land">
+            <option value="">Select</option>
+            <option value="3">Owns 2+ acres</option>
+            <option value="2">Owns less than 2 acres</option>
+            <option value="1">Leased / rented farmland</option>
+            <option value="0">No land</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Type of House</label>
+          <select id="house">
+            <option value="">Select</option>
+            <option value="2">Pucca (permanent structure)</option>
+            <option value="1">Semi-pucca</option>
+            <option value="0">Kachha / temporary</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Livestock Ownership</label>
+          <select id="livestock">
+            <option value="">Select</option>
+            <option value="2">Owns cattle / poultry (income-generating)</option>
+            <option value="1">Small livestock (personal use)</option>
+            <option value="0">None</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Savings / Bank Balance</label>
+          <select id="savings">
+            <option value="">Select</option>
+            <option value="2">Above ₹10,000</option>
+            <option value="1">₹1,000 – ₹10,000</option>
+            <option value="0">Below ₹1,000</option>
+          </select>
+        </div>
+
+        <div class="section-divider span2"><span>Government Scheme Participation</span></div>
+
+        <div class="form-group">
+          <label>Jan Dhan Account</label>
+          <select id="janDhan">
+            <option value="">Select</option>
+            <option value="2">Yes, actively used</option>
+            <option value="1">Yes, dormant</option>
+            <option value="0">No</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>PM Kisan / MGNREGA Beneficiary</label>
+          <select id="pmKisan">
+            <option value="">Select</option>
+            <option value="2">Yes</option>
+            <option value="0">No</option>
+          </select>
+        </div>
+        <div class="form-group span2">
+          <label>e-Shram / Aadhaar-linked Bank Account</label>
+          <select id="eShram">
+            <option value="">Select</option>
+            <option value="2">Both e-Shram registered + Aadhaar-linked account</option>
+            <option value="1">Only Aadhaar-linked account</option>
+            <option value="0">Neither</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn" onclick="calculateScore()">⚡ Generate My GraamScore →</button>
+      <button class="btn secondary" onclick="goStep(2)">← Back</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: RESULT -->
+  <div id="step4" class="hidden fade-up">
+
+    <!-- SCORE CARD -->
+    <div class="card" id="scoreCard">
+      <div class="profile-header" id="profileHeader"></div>
+
+      <div class="score-hero">
+        <div class="score-ring-wrap">
+          <svg viewBox="0 0 200 200">
+            <circle class="score-ring-bg" cx="100" cy="100" r="85"/>
+            <circle class="score-ring-fill" id="scoreRing" cx="100" cy="100" r="85"
+              stroke-dasharray="534" stroke-dashoffset="534"/>
+          </svg>
+          <div class="score-center">
+            <div class="score-number" id="scoreDisplay" style="color:var(--green)">0</div>
+            <div class="score-label">GraamScore</div>
+          </div>
+        </div>
+        <div class="tier-badge" id="tierBadge"></div>
+        <div id="tierDesc" style="font-size:0.88rem;color:var(--text-muted);margin-top:0.5rem;max-width:380px;margin-left:auto;margin-right:auto;"></div>
+      </div>
+
+      <div class="section-divider"><span>Score Breakdown</span></div>
+      <div class="breakdown-grid" id="breakdownGrid"></div>
+    </div>
+
+    <!-- LOAN ELIGIBILITY -->
+    <div class="card">
+      <div class="card-title"><span class="icon">💰</span> Loan Eligibility</div>
+      <div class="card-subtitle">Based on your GraamScore, here are schemes you qualify for</div>
+      <div class="loan-grid" id="loanGrid"></div>
+    </div>
+
+    <!-- IMPROVEMENT ROADMAP -->
+    <div class="card" id="roadmapCard">
+      <div class="card-title"><span class="icon">🗺️</span> Score Improvement Roadmap</div>
+      <div class="card-subtitle">Actions that will increase your GraamScore</div>
+      <div class="roadmap" id="roadmapList"></div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div style="display:flex;gap:1rem;flex-wrap:wrap;">
+      <button class="btn earth-btn" style="flex:1" onclick="downloadReport()">⬇️ Download Credit Report (PDF)</button>
+      <button class="btn secondary" style="flex:1" onclick="resetForm()">← Score Another Applicant</button>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+// ─── STATE ──────────────────────────────────────
+let finalScore = 0;
+let applicantName = '';
+let applicantLoc = '';
+let scoreBreakdown = {};
+
+// ─── SAMPLE DATA ────────────────────────────────
+const samples = {
+  ramesh: {
+    name: 'Ramesh Kumar', age: 42, village: 'Kurud', location: 'Dhamtari, Chhattisgarh',
+    income: 22000, loanNeed: 75000, occupation: 'farmer',
+    upiTxn: '2', upiInflow: '2', bills: '3', recharge: '1',
+    shg: '1', informal: '3',
+    land: '2', house: '1', livestock: '2', savings: '1',
+    janDhan: '2', pmKisan: '2', eShram: '1'
+  },
+  priya: {
+    name: 'Priya Devi', age: 34, village: 'Rajim', location: 'Gariaband, Chhattisgarh',
+    income: 15000, loanNeed: 30000, occupation: 'vendor',
+    upiTxn: '3', upiInflow: '1', bills: '2', recharge: '2',
+    shg: '3', informal: '3',
+    land: '0', house: '1', livestock: '0', savings: '1',
+    janDhan: '2', pmKisan: '0', eShram: '2'
+  },
+  arjun: {
+    name: 'Arjun Sahu', age: 28, village: 'Bilaspur', location: 'Bilaspur, Chhattisgarh',
+    income: 12000, loanNeed: 20000, occupation: 'artisan',
+    upiTxn: '1', upiInflow: '1', bills: '1', recharge: '1',
+    shg: '0', informal: '2',
+    land: '0', house: '0', livestock: '0', savings: '0',
+    janDhan: '1', pmKisan: '0', eShram: '1'
+  }
+};
+
+function fillSample(key) {
+  const s = samples[key];
+  document.getElementById('name').value = s.name;
+  document.getElementById('age').value = s.age;
+  document.getElementById('village').value = s.village;
+  document.getElementById('location').value = s.location;
+  document.getElementById('income').value = s.income;
+  document.getElementById('loanNeed').value = s.loanNeed;
+  document.querySelectorAll('input[name="occupation"]').forEach(r => {
+    r.checked = r.value === s.occupation;
+  });
+  // Pre-fill step 2 & 3 selects
+  ['upiTxn','upiInflow','bills','recharge','shg','informal',
+   'land','house','livestock','savings','janDhan','pmKisan','eShram'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = s[id];
+  });
+}
+
+// ─── NAVIGATION ─────────────────────────────────
+function goStep(n) {
+  [1,2,3,4].forEach(i => {
+    document.getElementById('step'+i).classList.add('hidden');
+    const tab = document.getElementById('step'+i+'tab');
+    if (tab) { tab.classList.remove('active','done'); }
+  });
+  document.getElementById('step'+n).classList.remove('hidden');
+  document.getElementById('step'+n).classList.add('fade-up');
+  for (let i = 1; i < n; i++) {
+    const tab = document.getElementById('step'+i+'tab');
+    if (tab) tab.classList.add('done');
+  }
+  const activeTab = document.getElementById('step'+n+'tab');
+  if (activeTab) activeTab.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+// ─── SCORING LOGIC ──────────────────────────────
+function calculateScore() {
+  const get = id => parseInt(document.getElementById(id)?.value || 0);
+
+  // UPI Behaviour (25 pts)
+  const upiScore = (get('upiTxn') === 3 ? 15 : get('upiTxn') === 2 ? 10 : get('upiTxn') === 1 ? 5 : 0)
+                 + (get('upiInflow') === 3 ? 10 : get('upiInflow') === 2 ? 7 : get('upiInflow') === 1 ? 3 : 0);
+
+  // Bill Payment (20 pts)
+  const billScore = (get('bills') === 3 ? 14 : get('bills') === 2 ? 9 : get('bills') === 1 ? 4 : 0)
+                  + (get('recharge') === 2 ? 6 : get('recharge') === 1 ? 3 : 0);
+
+  // SHG & Community (20 pts)
+  const shgScore = (get('shg') === 3 ? 13 : get('shg') === 2 ? 8 : get('shg') === 1 ? 4 : 0)
+                 + (get('informal') === 3 ? 7 : get('informal') === 2 ? 4 : get('informal') === 1 ? 1 : 0);
+
+  // Assets (20 pts)
+  const assetScore = (get('land') === 3 ? 8 : get('land') === 2 ? 5 : get('land') === 1 ? 2 : 0)
+                   + (get('house') === 2 ? 5 : get('house') === 1 ? 2 : 0)
+                   + (get('livestock') === 2 ? 4 : get('livestock') === 1 ? 2 : 0)
+                   + (get('savings') === 2 ? 3 : get('savings') === 1 ? 1 : 0);
+
+  // Government Participation (15 pts)
+  const govScore = (get('janDhan') === 2 ? 5 : get('janDhan') === 1 ? 2 : 0)
+                 + (get('pmKisan') === 2 ? 5 : 0)
+                 + (get('eShram') === 2 ? 5 : get('eShram') === 1 ? 3 : 0);
+
+  const total = Math.min(100, upiScore + billScore + shgScore + assetScore + govScore);
+
+  scoreBreakdown = {
+    'UPI Behaviour': { score: upiScore, max: 25 },
+    'Bill Discipline': { score: billScore, max: 20 },
+    'SHG & Community': { score: shgScore, max: 20 },
+    'Asset Base': { score: assetScore, max: 20 },
+    'Govt. Schemes': { score: govScore, max: 15 },
+  };
+
+  finalScore = total;
+  applicantName = document.getElementById('name').value || 'Applicant';
+  applicantLoc = document.getElementById('village').value + ', ' + document.getElementById('location').value;
+
+  goStep(4);
+  renderResult(total);
+}
+
+function getTier(score) {
+  if (score >= 75) return { label: 'PRIME', color: '#00c853', bg: 'rgba(0,200,83,0.15)', desc: 'Excellent credit profile. Eligible for best rates and maximum loan amounts from partner NBFCs.' };
+  if (score >= 50) return { label: 'STANDARD', color: '#ffd740', bg: 'rgba(255,215,64,0.15)', desc: 'Good credit profile. Eligible for most microfinance products with standard interest rates.' };
+  if (score >= 25) return { label: 'DEVELOPING', color: '#ff9800', bg: 'rgba(255,152,0,0.15)', desc: 'Building credit profile. Eligible for smaller loans with guarantor or collateral.' };
+  return { label: 'BUILDING', color: '#ff5252', bg: 'rgba(255,82,82,0.15)', desc: 'Early stage. Follow the roadmap below to build your credit profile within 3–6 months.' };
+}
+
+function renderResult(score) {
+  const tier = getTier(score);
+
+  // Profile header
+  const occ = document.querySelector('input[name="occupation"]:checked')?.value || '';
+  const emoji = { farmer:'🧑‍🌾', vendor:'🛒', artisan:'🪡', daily_wage:'🔨', small_shop:'🏪' }[occ] || '👤';
+  document.getElementById('profileHeader').innerHTML = `
+    <div class="profile-avatar">${emoji}</div>
+    <div>
+      <div class="profile-name">${applicantName}</div>
+      <div class="profile-loc">📍 ${applicantLoc}</div>
+      <div style="font-size:0.75rem;color:var(--text-muted);margin-top:0.2rem;">Loan Request: ₹${Number(document.getElementById('loanNeed').value||0).toLocaleString('en-IN')}</div>
+    </div>
+  `;
+
+  // Animate ring
+  const circumference = 534;
+  const offset = circumference - (score / 100) * circumference;
+  const ring = document.getElementById('scoreRing');
+  ring.style.stroke = tier.color;
+  setTimeout(() => { ring.style.strokeDashoffset = offset; }, 100);
+
+  // Animate number
+  const display = document.getElementById('scoreDisplay');
+  display.style.color = tier.color;
+  let cur = 0;
+  const interval = setInterval(() => {
+    cur = Math.min(cur + Math.ceil(score / 40), score);
+    display.textContent = cur;
+    if (cur >= score) clearInterval(interval);
+  }, 30);
+
+  // Tier badge
+  const badge = document.getElementById('tierBadge');
+  badge.textContent = tier.label;
+  badge.style.background = tier.bg;
+  badge.style.color = tier.color;
+  badge.style.border = `1px solid ${tier.color}40`;
+  document.getElementById('tierDesc').textContent = tier.desc;
+
+  // Breakdown
+  const grid = document.getElementById('breakdownGrid');
+  grid.innerHTML = Object.entries(scoreBreakdown).map(([label, {score: s, max}]) => {
+    const pct = Math.round((s / max) * 100);
+    const barColor = pct >= 70 ? 'var(--green)' : pct >= 40 ? 'var(--yellow)' : 'var(--red)';
+    return `
+      <div class="breakdown-item">
+        <div class="breakdown-label">${label}</div>
+        <div class="breakdown-bar-wrap">
+          <div class="breakdown-bar" style="width:${pct}%;background:${barColor}"></div>
+        </div>
+        <div class="breakdown-val">${s} / ${max}</div>
+      </div>`;
+  }).join('');
+
+  // Loan eligibility
+  const loanNeed = parseInt(document.getElementById('loanNeed').value || 0);
+  const loans = getLoanEligibility(score, loanNeed);
+  document.getElementById('loanGrid').innerHTML = loans.map(l => `
+    <div class="loan-card">
+      <div class="loan-name">${l.name}</div>
+      <div class="loan-amount">Up to ₹${l.amount.toLocaleString('en-IN')}</div>
+      <div class="loan-rate">@ ${l.rate}% p.a. | ${l.tenure}</div>
+      <span class="loan-eligible ${l.eligible ? 'eligible' : 'not-eligible'}">${l.eligible ? '✓ Eligible' : '✗ Not Eligible'}</span>
+    </div>`).join('');
+
+  // Roadmap
+  const roadmap = getRoadmap(scoreBreakdown);
+  if (roadmap.length === 0) {
+    document.getElementById('roadmapCard').innerHTML = `
+      <div class="card-title"><span class="icon">🎉</span> Excellent Profile!</div>
+      <div style="color:var(--text-muted);font-size:0.9rem;margin-top:0.5rem;">Your GraamScore is already in the Prime tier. You qualify for the best loan products available.</div>`;
+  } else {
+    document.getElementById('roadmapList').innerHTML = roadmap.map(r => `
+      <div class="roadmap-item">
+        <div class="roadmap-icon">${r.icon}</div>
+        <div class="roadmap-text">
+          <div class="roadmap-title">${r.action}</div>
+          <div class="roadmap-gain">+${r.gain} points in ${r.time}</div>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function getLoanEligibility(score, need) {
+  return [
+    { name: 'MUDRA Shishu', amount: 50000, rate: 8.5, tenure: '3 years', eligible: score >= 30 },
+    { name: 'MUDRA Kishore', amount: 500000, rate: 10, tenure: '5 years', eligible: score >= 50 },
+    { name: 'PM SVANidhi', amount: 50000, rate: 7, tenure: '1 year', eligible: score >= 25 },
+    { name: 'Kisan Credit Card', amount: 300000, rate: 7, tenure: 'Revolving', eligible: score >= 45 },
+    { name: 'NABARD SHG Linkage', amount: 200000, rate: 9, tenure: '3 years', eligible: score >= 40 },
+    { name: 'Microfinance (NBFC)', amount: 100000, rate: 14, tenure: '2 years', eligible: score >= 20 },
+    { name: 'PM Vishwakarma', amount: 300000, rate: 5, tenure: '5 years', eligible: score >= 35 },
+    { name: 'MSME Emergency Credit', amount: 1000000, rate: 9.25, tenure: '4 years', eligible: score >= 70 },
+  ];
+}
+
+function getRoadmap(breakdown) {
+  const tips = [];
+  if (breakdown['UPI Behaviour'].score < 20)
+    tips.push({ icon: '📱', action: 'Increase UPI transactions — pay for groceries, bills via UPI daily', gain: 12, time: '1 month' });
+  if (breakdown['Bill Discipline'].score < 15)
+    tips.push({ icon: '⚡', action: 'Set up auto-pay for electricity & water bills via BBPS', gain: 10, time: '3 months' });
+  if (breakdown['SHG & Community'].score < 15)
+    tips.push({ icon: '👥', action: 'Join a local SHG and maintain perfect repayment for 6 months', gain: 13, time: '6 months' });
+  if (breakdown['Asset Base'].score < 12)
+    tips.push({ icon: '🏡', action: 'Register property/land on DigiLocker to establish asset proof', gain: 8, time: '2 weeks' });
+  if (breakdown['Govt. Schemes'].score < 10)
+    tips.push({ icon: '🏛️', action: 'Register on PM Kisan, e-Shram portal and activate Jan Dhan account', gain: 10, time: '1 week' });
+  return tips.slice(0, 4);
+}
+
+// ─── PDF REPORT ─────────────────────────────────
+function downloadReport() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const tier = getTier(finalScore);
+  const date = new Date().toLocaleDateString('en-IN', { day:'numeric', month:'long', year:'numeric' });
+
+  // Header
+  doc.setFillColor(10, 26, 15);
+  doc.rect(0, 0, 210, 40, 'F');
+  doc.setTextColor(0, 200, 83);
+  doc.setFontSize(22); doc.setFont('helvetica','bold');
+  doc.text('GraamScore', 15, 18);
+  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.setTextColor(129, 199, 132);
+  doc.text('Rural Credit Intelligence Report', 15, 27);
+  doc.text(`Generated: ${date}`, 15, 34);
+  doc.setTextColor(200, 169, 110);
+  doc.text('RBI Account Aggregator Framework Aligned', 120, 27);
+
+  // Score box
+  doc.setFillColor(26, 51, 37);
+  doc.roundedRect(15, 50, 80, 50, 4, 4, 'F');
+  doc.setTextColor(0, 200, 83);
+  doc.setFontSize(36); doc.setFont('helvetica','bold');
+  doc.text(String(finalScore), 55, 75, { align: 'center' });
+  doc.setFontSize(9); doc.setFont('helvetica','normal');
+  doc.text('GRAAMSCORE / 100', 55, 85, { align: 'center' });
+  doc.setFontSize(12); doc.setFont('helvetica','bold');
+  doc.text(tier.label, 55, 95, { align: 'center' });
+
+  // Applicant info
+  doc.setFillColor(26, 51, 37);
+  doc.roundedRect(105, 50, 90, 50, 4, 4, 'F');
+  doc.setTextColor(129, 199, 132);
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.text('APPLICANT', 112, 62);
+  doc.setTextColor(232, 245, 233);
+  doc.setFontSize(11); doc.setFont('helvetica','bold');
+  doc.text(applicantName, 112, 70);
+  doc.setFontSize(8); doc.setFont('helvetica','normal');
+  doc.setTextColor(129, 199, 132);
+  doc.text(applicantLoc, 112, 78);
+  doc.text(`Income: ₹${Number(document.getElementById('income').value||0).toLocaleString('en-IN')}/month`, 112, 86);
+  doc.text(`Loan Needed: ₹${Number(document.getElementById('loanNeed').value||0).toLocaleString('en-IN')}`, 112, 93);
+
+  // Breakdown
+  doc.setFontSize(11); doc.setFont('helvetica','bold');
+  doc.setTextColor(232, 245, 233);
+  doc.text('Score Breakdown', 15, 115);
+  let y = 122;
+  Object.entries(scoreBreakdown).forEach(([label, {score: s, max}]) => {
+    doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.setTextColor(129, 199, 132);
+    doc.text(label, 15, y);
+    doc.setTextColor(0, 200, 83);
+    doc.setFont('helvetica','bold');
+    doc.text(`${s} / ${max}`, 185, y, { align: 'right' });
+    doc.setFillColor(26, 51, 37);
+    doc.roundedRect(15, y+2, 170, 4, 2, 2, 'F');
+    doc.setFillColor(0, 200, 83);
+    doc.roundedRect(15, y+2, (s/max)*170, 4, 2, 2, 'F');
+    y += 14;
+  });
+
+  // Eligible loans
+  y += 6;
+  doc.setFontSize(11); doc.setFont('helvetica','bold');
+  doc.setTextColor(232, 245, 233);
+  doc.text('Eligible Loan Schemes', 15, y); y += 8;
+  getLoanEligibility(finalScore, 0).filter(l => l.eligible).forEach(l => {
+    doc.setFontSize(8); doc.setFont('helvetica','normal');
+    doc.setTextColor(0, 200, 83);
+    doc.text(`✓ ${l.name}`, 15, y);
+    doc.setTextColor(129, 199, 132);
+    doc.text(`Up to ₹${l.amount.toLocaleString('en-IN')} @ ${l.rate}%`, 185, y, { align:'right' });
+    y += 9;
+  });
+
+  // Footer
+  doc.setFillColor(10, 26, 15);
+  doc.rect(0, 275, 210, 22, 'F');
+  doc.setFontSize(7); doc.setFont('helvetica','normal');
+  doc.setTextColor(129, 199, 132);
+  doc.text('This report is generated using alternative data scoring aligned with RBI Account Aggregator Framework.', 105, 283, { align: 'center' });
+  doc.text('For submission to partner NBFCs and microfinance institutions. | GraamScore © 2026', 105, 289, { align: 'center' });
+
+  doc.save(`GraamScore_${applicantName.replace(' ','_')}_${date}.pdf`);
+}
+
+// ─── RESET ───────────────────────────────────────
+function resetForm() {
+  document.querySelectorAll('input[type=text], input[type=number]').forEach(el => el.value = '');
+  document.querySelectorAll('select').forEach(el => el.value = '');
+  document.querySelectorAll('input[type=radio]').forEach(el => el.checked = false);
+  goStep(1);
+}
+
+// Radio visual fix
+document.addEventListener('change', e => {
+  if (e.target.type === 'radio' && e.target.name === 'occupation') {
+    document.querySelectorAll('.radio-btn').forEach(b => b.classList.remove('selected'));
+    e.target.closest('.radio-btn').classList.add('selected');
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,102 @@
+openapi: 3.0.0
+info:
+  title: GraamSetu API
+  version: "1.0.0"
+
+paths:
+  /score/{userId}:
+    get:
+      summary: Get latest GraamScore
+      security:
+        - bearerAuth: []
+  /score/history/{userId}:
+    get:
+      summary: Get score history
+      security:
+        - bearerAuth: []
+  /score/report/{reportId}:
+    get:
+      summary: Get credit report details
+      security:
+        - bearerAuth: []
+  /schemes/eligible/{userId}:
+    get:
+      summary: Eligible schemes list
+      security:
+        - bearerAuth: []
+  /schemes:
+    get:
+      summary: Profile-driven categorized scheme eligibility
+      security:
+        - bearerAuth: []
+  /schemes/enrolled/{userId}:
+    get:
+      summary: Enrolled schemes
+      security:
+        - bearerAuth: []
+  /schemes/apply:
+    post:
+      summary: Apply for scheme
+      security:
+        - bearerAuth: []
+  /schemes/grievance:
+    post:
+      summary: File grievance
+      security:
+        - bearerAuth: []
+  /schemes/payment-history:
+    get:
+      summary: DBT payment timeline
+      security:
+        - bearerAuth: []
+  /schemes/application-status:
+    get:
+      summary: Scheme application tracking status
+      security:
+        - bearerAuth: []
+  /savings/create-goal:
+    post:
+      summary: Create savings goal
+      security:
+        - bearerAuth: []
+  /savings/goals/{userId}:
+    get:
+      summary: List savings goals
+      security:
+        - bearerAuth: []
+  /savings/update-progress:
+    post:
+      summary: Update savings progress
+      security:
+        - bearerAuth: []
+  /savings/advice:
+    get:
+      summary: AI savings advice
+      security:
+        - bearerAuth: []
+  /rights/situation/{type}:
+    get:
+      summary: Rights guidance by situation
+  /rights/minimum-wage:
+    get:
+      summary: Minimum wage checker
+  /fraud/report:
+    post:
+      summary: Fraud report submission
+      security:
+        - bearerAuth: []
+  /fraud/district/{district}:
+    get:
+      summary: District fraud alerts
+  /chatbot/query:
+    post:
+      summary: Legal rights chatbot
+      security:
+        - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
