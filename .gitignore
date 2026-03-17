@@ -4,11 +4,8 @@ dist/
 data/
 *.log
 
-# Local environment files (never commit secrets)
+# Local environment files (never commit)
 .env
 .env.*
-!.env.example
-
 backend/.env
 backend/.env.*
-!backend/.env.example
