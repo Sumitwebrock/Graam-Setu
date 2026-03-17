@@ -8,6 +8,12 @@ import { env } from "../config/env.js";
 
 const OTP_TTL_SECONDS = 300;
 
+const createHttpError = (message, statusCode) => {
+  const error = new Error(message);
+  error.statusCode = statusCode;
+  return error;
+};
+
 const issueToken = (payload) => jwt.sign(payload, env.JWT_SECRET, { expiresIn: env.JWT_EXPIRY });
 
 const hashPassword = (password) => {
@@ -38,7 +44,7 @@ const normalizePhone = (phone) => (phone || "").replace(/\D/g, "").slice(-10);
 export const startOtpLogin = async (phone) => {
   const cleanPhone = phone?.trim();
   if (!cleanPhone) {
-    throw new Error("Phone is required");
+    throw createHttpError("Phone is required", 400);
   }
 
   const otpSessionId = uuidv4();
@@ -70,11 +76,11 @@ export const verifyOtpAndIssueJwt = async ({ otpSessionId, otp, firebaseIdToken 
   } else if (redis && otpSessionId && otp) {
     const payload = await redis.get(`otp:${otpSessionId}`);
     if (!payload) {
-      throw new Error("OTP session expired or invalid");
+      throw createHttpError("OTP session expired or invalid", 400);
     }
     const parsed = JSON.parse(payload);
     if (parsed.mockOtp !== otp) {
-      throw new Error("Invalid OTP");
+      throw createHttpError("Invalid OTP", 401);
     }
     phoneNumber = parsed.phone;
   } else if (otp === "123456") {
@@ -83,7 +89,7 @@ export const verifyOtpAndIssueJwt = async ({ otpSessionId, otp, firebaseIdToken 
   }
 
   if (!phoneNumber) {
-    throw new Error("Unable to verify OTP");
+    throw createHttpError("Unable to verify OTP", 401);
   }
 
   let userRecord;
@@ -124,7 +130,7 @@ export const verifyOtpAndIssueJwt = async ({ otpSessionId, otp, firebaseIdToken 
 export const getProfileFromToken = async (uid) => {
   const snapshot = await firestore.collection("users").doc(uid).get();
   if (!snapshot.exists) {
-    throw new Error("User not found");
+    throw createHttpError("User not found", 404);
   }
   return { uid: snapshot.id, ...snapshot.data() };
 };
@@ -137,7 +143,7 @@ export const registerCompatibility = async (payload) => {
   const password = payload.password || "";
 
   if (!phone || !name || !password) {
-    throw new Error("Full name, phone and password are required");
+    throw createHttpError("Full name, phone and password are required", 400);
   }
 
   let userRecord;
@@ -196,7 +202,7 @@ export const loginCompatibility = async (payload) => {
   const password = payload.password || "";
 
   if (!identifier || !password) {
-    throw new Error("Identifier and password are required");
+    throw createHttpError("Identifier and password are required", 400);
   }
 
   let userRecord = null;
@@ -224,12 +230,12 @@ export const loginCompatibility = async (payload) => {
   }
 
   if (!userRecord) {
-    throw new Error("User not found. Please register first.");
+    throw createHttpError("User not found. Please register first.", 404);
   }
 
   const isValidPassword = verifyPassword(password, userRecord.passwordHash);
   if (!isValidPassword) {
-    throw new Error("Invalid password.");
+    throw createHttpError("Invalid password.", 401);
   }
 
   const accessToken = issueToken({

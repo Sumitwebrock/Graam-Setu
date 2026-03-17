@@ -36,12 +36,26 @@ const allowedOrigins = [
   ),
 ];
 
+const allowedDevOriginPattern = /^http:\/\/(localhost|127\.0\.0\.1|(?:10|192\.168)(?:\.\d{1,3}){2}|172\.(?:1[6-9]|2\d|3[0-1])\.\d{1,3}\.\d{1,3})(?::(?:5173|5174))?$/;
+
+const isAllowedOrigin = (origin) => {
+  if (!origin) {
+    return true;
+  }
+
+  if (allowedOrigins.includes(origin)) {
+    return true;
+  }
+
+  return allowedDevOriginPattern.test(origin);
+};
+
 app.use(helmet());
 app.use(
   cors({
     origin(origin, callback) {
-      // Allow non-browser clients and localhost dev origins.
-      if (!origin || allowedOrigins.includes(origin)) {
+      // Allow non-browser clients, configured origins, and local network Vite dev origins.
+      if (isAllowedOrigin(origin)) {
         return callback(null, true);
       }
       return callback(new Error("CORS origin not allowed"));
